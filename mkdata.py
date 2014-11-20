@@ -43,28 +43,41 @@ def mk_time_version_mapping():
     out.close()
 
 
-def mk_dependency_time_mapping():
+def mk_dependency_time_mapping(end):
     time_map = json.load(open("datasets/last_times.json", "r"))
+    dates = sorted(time_map.keys())[:end]
+    # dates.sort()
+    # dates = dates[:end]
     total = reduce(lambda x, y: x+y,
-                   [len(time_map[i]) for i in time_map.keys()])
+                   [len(time_map[i]) for i in dates])
+    failedPackages = []
+    newMap = {}
     pb = ProgressBar(total)
-    for date in time_map.keys():
+    for date in dates:
+        newMap[date] = []
         for pkg in time_map[date]:
             try:
-                dependencies = get_pkg(pkg["pakage"],
+                dependencies = get_pkg(pkg["package"],
                                        pkg["version"])["dependencies"]
-                dependencies = [{"pakage": key, "version": dependencies[key]}
+                dependencies = [{"package": key, "version": dependencies[key]}
                                 for key in dependencies.keys()]
                 # print dependencies
             except KeyError as e:
-
+                dependencies = []
+            except requests.exceptions.ConnectionError as error:
+                failedPackages += [pkg]
                 dependencies = []
 
             pkg["dependencies"] = dependencies
+            newMap[date] += [pkg]
             pb.tick()
 
-    out = open("datasets/dependencies_times.json", "w+")
-    out.write(json.dumps(time_map))
+    out = open("datasets/dependencies_times_0_to_%s.json" % end, "w+")
+    out.write(json.dumps(newMap))
     out.close()
 
-mk_dependency_time_mapping()
+    fail = open("datasets/FAIL_dependencies_times_0_to_%s.json" % end, "w+")
+    fail.write(json.dumps(failedPackages))
+    fail.close()
+
+mk_dependency_time_mapping(10)
