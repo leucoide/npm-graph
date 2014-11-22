@@ -44,17 +44,18 @@ def mk_time_version_mapping():
 
 
 def mk_dependency_time_mapping(end):
-    time_map = json.load(open("datasets/last_times.json", "r"))
+    time_map = json.load(open("datasets/fixed_last_times.json", "r"))
     dates = sorted(time_map.keys())[:end]
     # dates.sort()
     # dates = dates[:end]
     total = reduce(lambda x, y: x+y,
                    [len(time_map[i]) for i in dates])
-    failedPackages = []
+    failedPackages = {}
     newMap = {}
     pb = ProgressBar(total)
     for date in dates:
         newMap[date] = []
+        failedPackages[date] = []
         for pkg in time_map[date]:
             try:
                 dependencies = get_pkg(pkg["package"],
@@ -65,7 +66,7 @@ def mk_dependency_time_mapping(end):
             except KeyError as e:
                 dependencies = []
             except requests.exceptions.ConnectionError as error:
-                failedPackages += [pkg]
+                failedPackages[date] += [pkg]
                 dependencies = []
 
             pkg["dependencies"] = dependencies
@@ -80,4 +81,4 @@ def mk_dependency_time_mapping(end):
     fail.write(json.dumps(failedPackages))
     fail.close()
 
-mk_dependency_time_mapping(10)
+mk_dependency_time_mapping(150)
