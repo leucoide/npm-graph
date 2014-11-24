@@ -4,6 +4,7 @@ import requests
 from progressbar import *
 import json
 import re
+from mknetwork import *
 
 NPM_URL = "http://registry.npmjs.com"
 
@@ -43,11 +44,10 @@ def mk_time_version_mapping():
     out.close()
 
 
-def mk_dependency_time_mapping(end):
-    time_map = json.load(open("datasets/fixed_last_times.json", "r"))
-    dates = sorted(time_map.keys())[:end]
-    # dates.sort()
-    # dates = dates[:end]
+def mk_dependency_time_mapping(start=None, end=100):
+    start = start - 1 if start is not None else 0
+    time_map = json.load(open("datasets/last_times.json", "r"))
+    dates = sorted(time_map.keys())[start:end-1]
     total = reduce(lambda x, y: x+y,
                    [len(time_map[i]) for i in dates])
     failedPackages = {}
@@ -73,12 +73,34 @@ def mk_dependency_time_mapping(end):
             newMap[date] += [pkg]
             pb.tick()
 
-    out = open("datasets/dependencies_times_0_to_%s.json" % end, "w+")
-    out.write(json.dumps(newMap))
-    out.close()
+    TimedSet(newMap).consolidateToDB()
+    writeToFile({
+        "path": "datasets/FAIL_dependencies_times_%s_to_%s.json"
+                % (start+1, end),
+        "content": json.dumps(failedPackages)
+        })
+    # writeToFile({
+    #     "path": "datasets/dependencies_times_%s_to_%s.json" % (start+1, end),
+    #     "content": json.dumps(newMap)},
+    #     {
+    #     "path": "datasets/FAIL_dependencies_times_%s_to_%s.json"
+    #             % (start+1, end),
+    #     "content": json.dumps(failedPackages)
+    #     })
 
-    fail = open("datasets/FAIL_dependencies_times_0_to_%s.json" % end, "w+")
-    fail.write(json.dumps(failedPackages))
-    fail.close()
+    # out = open("datasets/dependencies_times_0_to_%s.json" % end, "w+")
+    # out.write(json.dumps(newMap))
+    # out.close()
+    #
+    # fail = open("datasets/FAIL_dependencies_times_0_to_%s.json" % end, "w+")
+    # fail.write(json.dumps(failedPackages))
+    # fail.close()
 
-mk_dependency_time_mapping(150)
+
+def writeToFile(*itens):
+    for item in itens:
+        out = open(item["path"], "w+")
+        out.write(item["content"])
+        out.close()
+
+mk_dependency_time_mapping(101, 200)
