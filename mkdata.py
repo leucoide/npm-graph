@@ -47,7 +47,7 @@ def mk_time_version_mapping():
 def mk_dependency_time_mapping(start=None, end=100):
     start = start - 1 if start is not None else 0
     time_map = json.load(open("datasets/last_times.json", "r"))
-    dates = sorted(time_map.keys())[start:end-1]
+    dates = sorted(time_map.keys())[start:end]
     total = reduce(lambda x, y: x+y,
                    [len(time_map[i]) for i in dates])
     failedPackages = {}
@@ -79,22 +79,6 @@ def mk_dependency_time_mapping(start=None, end=100):
                 % (start+1, end),
         "content": json.dumps(failedPackages)
         })
-    # writeToFile({
-    #     "path": "datasets/dependencies_times_%s_to_%s.json" % (start+1, end),
-    #     "content": json.dumps(newMap)},
-    #     {
-    #     "path": "datasets/FAIL_dependencies_times_%s_to_%s.json"
-    #             % (start+1, end),
-    #     "content": json.dumps(failedPackages)
-    #     })
-
-    # out = open("datasets/dependencies_times_0_to_%s.json" % end, "w+")
-    # out.write(json.dumps(newMap))
-    # out.close()
-    #
-    # fail = open("datasets/FAIL_dependencies_times_0_to_%s.json" % end, "w+")
-    # fail.write(json.dumps(failedPackages))
-    # fail.close()
 
 
 def writeToFile(*itens):
@@ -103,4 +87,4 @@ def writeToFile(*itens):
         out.write(item["content"])
         out.close()
 
-mk_dependency_time_mapping(101, 200)
+mk_dependency_time_mapping(1, 200)

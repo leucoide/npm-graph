@@ -33,13 +33,13 @@ class TimedSet(object):
                 times.store({t: self.timeMap[t]})
         db.commit()
 
-    def consolidateDaysUntil(timeIndex):
-        previousDays = []
-        for ti in range(1, timeIndex+1):
-            m = self.mergeUntil(ti)
-            if previousDays != []:
-                if m f g:
-                    pass
+    # def consolidateDaysUntil(timeIndex):
+    #     previousDays = []
+    #     for ti in range(1, timeIndex+1):
+    #         m = self.mergeUntil(ti)
+    #         if previousDays != []:
+    #             if m f g:
+    #                 pass
 
     def networkOn(self, timeIndex):
         v_map = {}
@@ -98,7 +98,7 @@ class Day(object):
 # tm = json.load(open("datasets/dependencies_times_0_to_100.json", "r"))
 # ts = TimedSet(tm)
 # ts.consolidateToDB()
-g = DBTimedSet().networkOn(150)
+# g = DBTimedSet().networkOn(150)
 
 # g = ts.networkOn(100)
 # notAlone = g.new_vertex_property("bool")
