@@ -1,7 +1,8 @@
+import matplotlib.pyplot as plt
 import simplejson as json
 from graph_tool.all import *
 from unqlite import UnQLite
-import matplotlib.pyplot as plt
+
 
 DB_PATH = "datasets/data.db"
 
