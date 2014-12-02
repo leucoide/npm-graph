@@ -3,6 +3,8 @@ from graph_tool.all import *
 from unqlite import UnQLite
 import config
 from porc import Client
+from datetime import datetime
+
 
 DB_PATH = "datasets/data.db"
 
@@ -36,7 +38,8 @@ class TimedSet(object):
         db.close()
 
     def consolidateToOrchestrate(self):
-        client = CLient(config.PORC_KEY)
+        col_name = "daily_entries"
+        client = Client(config.PORC_KEY)
         for time in self.times:
             date_list = [int(i) for i in time.split("-")]
             date = datetime(date_list[0], date_list[1], date_list[2])
